@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MainMenuService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">projekt1</a> &gt; <a href="index.source.html" class="el_package">service</a> &gt; <span class="el_source">MainMenuService.kt</span></div><h1>MainMenuService.kt</h1><pre class="source lang-java linenums">package service
+
+import entity.*
+import kotlin.system.exitProcess
+
+/**
+ * Service layer class providing the logic for main menu related actions.
+ *
+ * @param gameService the main class of this service layer instance
+ */
+<span class="nc" id="L11">class MainMenuService(private val gameService: GameService): AbstractRefreshingService() {</span>
+
+    /**
+     * Initiates a new game of &quot;Schwimmen.&quot;
+     *
+     * @param p1 name of a player, necessary since two players minimum
+     * @param p2 name of another player, necessary since two players minimum
+     * @param p3 optional name of an additional player
+     * @param p4 optional name of an additional player
+     */
+    fun startGame(p1: String, p2: String, p3: String?, p4: String?) {
+<span class="nc bnc" id="L22" title="All 4 branches missed.">        val players = listOfNotNull(Player(p1), Player(p2), p3?.let { Player(it) }, p4?.let { Player(it) })</span>
+<span class="nc" id="L23">        val game = Game(players)</span>
+<span class="nc" id="L24">        gameService.currentGame = game</span>
+<span class="nc" id="L25">        with(gameService) {</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">            for(player in game.players) {</span>
+<span class="nc" id="L27">                player.handOutCards()</span>
+            }
+<span class="nc" id="L29">        }</span>
+<span class="nc" id="L30">        onAllRefreshables {</span>
+<span class="nc" id="L31">            refreshAfterStartGame()</span>
+<span class="nc" id="L32">        }</span>
+<span class="nc" id="L33">    }</span>
+
+    /**
+     * ends the application with exit code 0
+     */
+    fun quitGame() {
+<span class="nc" id="L39">        exitProcess(0)</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

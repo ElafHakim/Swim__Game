@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">projekt1</a> &gt; <a href="index.source.html" class="el_package">service</a> &gt; <span class="el_source">GameService.kt</span></div><h1>GameService.kt</h1><pre class="source lang-java linenums">package service
+
+import entity.*
+import view.*
+
+/**
+ * Main class of the service layer for &quot;Schwimmen&quot;. Provides access
+ * to all other service classes and holds the [currentGame] state for these
+ * services to access. Also provides the logic for actions not directly
+ * related to a single player.
+ *
+ * @throws UninitializedPropertyAccessException if [currentGame] is accessed before the game has started
+ */
+<span class="nc" id="L14">class GameService: AbstractRefreshingService() {</span>
+
+    /**
+     * The currently active game. Initialized when startGame() in [MainMenuService] is called.
+     *
+     * @throws UninitializedPropertyAccessException if accessed before initialization
+     */
+<span class="nc bnc" id="L21" title="All 2 branches missed.">     lateinit var currentGame: Game</span>
+
+    /**
+     * The [MainMenuService] this class provides access to.
+     */
+<span class="nc" id="L26">    val menuService: MainMenuService = MainMenuService(this)</span>
+
+    /**
+     * The [ActionService] this class provides access to.
+     */
+<span class="nc" id="L31">    val actionService: ActionService = ActionService(this)</span>
+
+    // player after current player in the list, first player if current is last element
+<span class="nc" id="L34">    private val nextPlayer get() = currentGame.players.let { it[(it.indexOf(currentGame.currentPlayer) + 1) % it.size] }</span>
+
+    /**
+     * The current player is set to the next player.
+     *
+     * @throws UninitializedPropertyAccessException if the game has not started i.e. [MainMenuService.startGame] has
+     * not been called
+     */
+    fun nextRound() {
+<span class="nc" id="L43">        currentGame.currentPlayer = nextPlayer</span>
+<span class="nc" id="L44">    }</span>
+
+    /**
+     * Ends the game if the next player has knocked.
+     *
+     * @throws UninitializedPropertyAccessException if the game has not started i.e. [MainMenuService.startGame] has
+     * not been called
+     */
+    fun endGameIfNecessary() {
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if(nextPlayer.hasKnocked) {</span>
+<span class="nc" id="L54">            endGame()</span>
+        }
+<span class="nc" id="L56">    }</span>
+
+    /**
+     * Hands out top three cards form the [DrawPile] to the layer and refreshes.
+     *
+     * @throws UninitializedPropertyAccessException if the game has not started i.e. [MainMenuService.startGame] has
+     * not been called
+     */
+    fun Player.handOutCards() {
+<span class="nc" id="L65">        this.hand = currentGame.drawPile.drawThree()</span>
+<span class="nc" id="L66">        onAllRefreshables {</span>
+<span class="nc" id="L67">            refreshAfterPlayerStateChange(this@handOutCards)</span>
+<span class="nc" id="L68">        }</span>
+<span class="nc" id="L69">    }</span>
+
+    /**
+     * Places top three cards form the [DrawPile] in the center of the board and refreshes.
+     *
+     * @throws UninitializedPropertyAccessException if the game has not started i.e. [MainMenuService.startGame] has
+     * not been called
+     */
+    fun resetPlacedCards() {
+<span class="nc" id="L78">        currentGame.placedCards = currentGame.drawPile.drawThree()</span>
+<span class="nc" id="L79">        onAllRefreshables {</span>
+<span class="nc" id="L80">            refreshAfterPlacedCardsChange()</span>
+<span class="nc" id="L81">        }</span>
+<span class="nc" id="L82">    }</span>
+
+    /**
+     * Makes the necessary refresh after game end.
+     */
+    fun endGame() {
+<span class="nc" id="L88">        onAllRefreshables {</span>
+<span class="nc" id="L89">            refreshAfterEndGame()</span>
+<span class="nc" id="L90">        }</span>
+<span class="nc" id="L91">    }</span>
+
+    /**
+     * Adds the provided [refreshable] to all services connected
+     * to this root service
+     */
+    fun addRefreshableToServiceLayer(refreshable: Refreshable) {
+<span class="nc" id="L98">        this.addRefreshable(refreshable)</span>
+<span class="nc" id="L99">        menuService.addRefreshable(refreshable)</span>
+<span class="nc" id="L100">        actionService.addRefreshable(refreshable)</span>
+<span class="nc" id="L101">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

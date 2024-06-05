@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">projekt1</a> &gt; <a href="index.source.html" class="el_package">entity</a> &gt; <span class="el_source">Player.kt</span></div><h1>Player.kt</h1><pre class="source lang-java linenums">package entity
+
+import java.lang.IllegalArgumentException
+
+/**
+ * Entity to represent a player in the game &quot;Schwimmen&quot;. The player has a [name], a list [hand] of his three current
+ * hand cards and a boolean [hasKnocked] keeping track of whether he has knocked.
+ *
+ * At initialisation, a check whether the [name] is non-empty is performed. The value of [points] represents the
+ * value of the players current hand and is calculated on basis of the current [hand] according to game rules at
+ * every access.
+ *
+ * @param name A non-empty [String] representing the name of the player.
+ * @throws IllegalStateException if the [name] parameter is an empty string
+ */
+<span class="nc" id="L16">class Player(val name: String) {</span>
+
+    /**
+     * Indicates weather this player has knocked.
+     */
+<span class="nc" id="L21">    var hasKnocked = false</span>
+
+    /**
+     * The three [Card]s in this players hand. At game start, this value gets assigned three cards from the games
+     * stack.
+     *
+     * @throws IllegalArgumentException when a list that has a size other than three is assigned to this variable
+     */
+<span class="nc" id="L29">    var hand = emptyList&lt;Card&gt;()</span>
+        set(value) {
+<span class="nc bnc" id="L31" title="All 2 branches missed.">            field = if(value.size == 3) {</span>
+<span class="nc" id="L32">                value</span>
+            } else {
+<span class="nc" id="L34">                throw IllegalArgumentException(&quot;list of placed cards should be of size 3&quot;)</span>
+            }
+<span class="nc" id="L36">        }</span>
+
+    /**
+     * The value of this players hand according to the games rules i.e. 30.5 if all three cards have the same value,
+     * the maximal sum of point values of cards with the same color else.
+     */
+    val points get() =
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if(hand.distinctBy { it.value }.size == 1) {</span>
+<span class="nc" id="L44">            30.5</span>
+        } else {
+<span class="nc bnc" id="L46" title="All 16 branches missed.">            CardSuit.values().maxOf { s -&gt;  hand.sumOf { if (it.suit == s) it.points else 0.0 } }</span>
+<span class="nc" id="L47">        }</span>
+
+<span class="nc" id="L49">    init {</span>
+<span class="nc bnc" id="L50" title="All 4 branches missed.">        check(name.length &gt; 0) {</span>
+<span class="nc" id="L51">            &quot;name should not be empty&quot;</span>
+        }
+<span class="nc" id="L53">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

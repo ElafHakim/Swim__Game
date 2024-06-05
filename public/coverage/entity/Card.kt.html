@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Card.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">projekt1</a> &gt; <a href="index.source.html" class="el_package">entity</a> &gt; <span class="el_source">Card.kt</span></div><h1>Card.kt</h1><pre class="source lang-java linenums">package entity
+
+/**
+ * Data class for the card objects.
+ *
+ * It is characterized by a [CardSuit] and a [CardValue]. The value of [points] is calculated on basis of the
+ * [value] according to the game rules.
+ *
+ * @param suit The suit of the card.
+ * @param value The value of the card.
+ */
+
+<span class="nc" id="L13">data class Card(val suit: CardSuit, val value: CardValue) {</span>
+
+<span class="nc" id="L15">    override fun toString() = &quot;$suit$value&quot;</span>
+
+    /**
+     * The number of points the card contributes to the [Player]s score. Since 30.5 is a possible score, this variable
+     * is a floating point number.
+     */
+<span class="nc bnc" id="L21" title="All 10 branches missed.">    val points = when(value) {</span>
+<span class="nc" id="L22">        CardValue.TWO -&gt; 2.0</span>
+<span class="nc" id="L23">        CardValue.THREE -&gt; 3.0</span>
+<span class="nc" id="L24">        CardValue.FOUR -&gt; 4.0</span>
+<span class="nc" id="L25">        CardValue.FIVE -&gt; 5.0</span>
+<span class="nc" id="L26">        CardValue.SIX -&gt; 6.0</span>
+<span class="nc" id="L27">        CardValue.SEVEN -&gt; 7.0</span>
+<span class="nc" id="L28">        CardValue.EIGHT -&gt; 8.0</span>
+<span class="nc" id="L29">        CardValue.NINE -&gt; 9.0</span>
+<span class="nc" id="L30">        CardValue.TEN, CardValue.JACK, CardValue.QUEEN, CardValue.KING -&gt; 10.0</span>
+<span class="nc" id="L31">        CardValue.ACE -&gt; 11.0</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ActionService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">projekt1</a> &gt; <a href="index.source.html" class="el_package">service</a> &gt; <span class="el_source">ActionService.kt</span></div><h1>ActionService.kt</h1><pre class="source lang-java linenums">package service
+
+import  entity.*
+
+/**
+ * Service layer class that provides the logic for the four possible actions a player
+ * can take in &quot;Schwimmen&quot;.
+ *
+ * @param gameService the main class of this service layer instance
+ */
+<span class="nc" id="L11">class ActionService(private val gameService: GameService): AbstractRefreshingService() {</span>
+
+<span class="nc" id="L13">    private val game get() = gameService.currentGame</span>
+
+    /**
+     * Lets the current player pass. If all players have passed in succession, the card in the center are replaced.
+     * If not enough cards to replace the center are left, the game ends. If the next player has knocked, the game
+     * ends.
+     *
+     * @throws UninitializedPropertyAccessException if the game has not started i.e. [MainMenuService.startGame] has
+     * not been called
+     */
+    fun pass() {
+<span class="nc" id="L24">        game.passCount++</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        if(game.passCount == game.players.size) {</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">            if (game.drawPile.size &gt;= 3) {</span>
+<span class="nc" id="L27">                gameService.resetPlacedCards()</span>
+<span class="nc" id="L28">                game.passCount = 0</span>
+<span class="nc" id="L29">                onAllRefreshables {</span>
+<span class="nc" id="L30">                    refreshAfterPlacedCardsChange()</span>
+<span class="nc" id="L31">                }</span>
+            } else {
+<span class="nc" id="L33">                gameService.endGame()</span>
+            }
+        }
+<span class="nc" id="L36">        gameService.endGameIfNecessary()</span>
+<span class="nc" id="L37">    }</span>
+
+    /**
+     * The [cardInHand] and the [cardOnTable] get switched. The pass counter is reset. If the next player has knocked,
+     * the game ends.
+     *
+     * @param cardInHand the hand card to be replaced by a card from the center
+     * @param cardOnTable the table card to be replaced by a card from the players hand
+     * @throws UninitializedPropertyAccessException if the game has not started i.e. [MainMenuService.startGame] has
+     * not been called
+     */
+    fun tradeOne(cardInHand: Card, cardOnTable: Card) {
+<span class="nc" id="L49">        val player = game.currentPlayer</span>
+<span class="nc" id="L50">        player.hand = listOf(replaceCardIfEqual(player.hand[0], cardInHand, cardOnTable),</span>
+<span class="nc" id="L51">                             replaceCardIfEqual(player.hand[1], cardInHand, cardOnTable),</span>
+<span class="nc" id="L52">                             replaceCardIfEqual(player.hand[2], cardInHand, cardOnTable))</span>
+<span class="nc" id="L53">        game.placedCards = listOf(replaceCardIfEqual(game.placedCards[0], cardOnTable, cardInHand),</span>
+<span class="nc" id="L54">                                  replaceCardIfEqual(game.placedCards[1], cardOnTable, cardInHand),</span>
+<span class="nc" id="L55">                                  replaceCardIfEqual(game.placedCards[2], cardOnTable, cardInHand))</span>
+<span class="nc" id="L56">        game.passCount = 0</span>
+<span class="nc" id="L57">        onAllRefreshables {</span>
+<span class="nc" id="L58">            refreshAfterPlayerStateChange(game.currentPlayer)</span>
+<span class="nc" id="L59">            refreshAfterPlacedCardsChange()</span>
+<span class="nc" id="L60">        }</span>
+<span class="nc" id="L61">        gameService.endGameIfNecessary()</span>
+<span class="nc" id="L62">    }</span>
+
+    private fun replaceCardIfEqual(current: Card, cardToReplace: Card, replacement: Card): Card {
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        return if (current == cardToReplace) replacement else current</span>
+    }
+
+    /**
+     * The current players hand and the cards in the center are switched. The pass counter is reset.
+     * If the next player has knocked, the game ends.
+     *
+     * @throws UninitializedPropertyAccessException if the game has not started i.e. [MainMenuService.startGame] has
+     * not been called
+     */
+    fun takeAll() {
+<span class="nc" id="L76">        val player = game.currentPlayer</span>
+<span class="nc" id="L77">        player.hand = game.placedCards.also { game.placedCards = player.hand }</span>
+<span class="nc" id="L78">        game.passCount = 0</span>
+<span class="nc" id="L79">        onAllRefreshables {</span>
+<span class="nc" id="L80">            refreshAfterPlayerStateChange(game.currentPlayer)</span>
+<span class="nc" id="L81">            refreshAfterPlacedCardsChange()</span>
+<span class="nc" id="L82">        }</span>
+<span class="nc" id="L83">        gameService.endGameIfNecessary()</span>
+<span class="nc" id="L84">    }</span>
+
+    /**
+     *  The current players knocked status is set to true. The pass counter is reset.
+     *  If the next player has knocked, the game ends.
+     *
+     * @throws UninitializedPropertyAccessException if the game has not started i.e. [MainMenuService.startGame] has
+     * not been called
+     */
+    fun knock() {
+<span class="nc" id="L94">        game.currentPlayer.hasKnocked=true</span>
+<span class="nc" id="L95">        game.passCount = 0</span>
+<span class="nc" id="L96">        gameService.endGameIfNecessary()</span>
+<span class="nc" id="L97">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
